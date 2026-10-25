@@ -1,0 +1,8 @@
+@'
+node_modules/
+public/
+db.json
+.deploy_git/
+.DS_Store
+Thumbs.db
+'@ | Set-Content -Encoding utf8 .gitignore
