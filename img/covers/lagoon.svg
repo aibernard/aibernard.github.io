@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="800" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#071b2a"/>
+      <stop offset=".54" stop-color="#0a3147"/>
+      <stop offset="1" stop-color="#07545a"/>
+    </linearGradient>
+    <linearGradient id="sea" x1="210" y1="520" x2="1030" y2="520" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#49b1f5" stop-opacity=".1"/>
+      <stop offset=".5" stop-color="#49b1f5" stop-opacity=".75"/>
+      <stop offset="1" stop-color="#00c4b6" stop-opacity=".1"/>
+    </linearGradient>
+    <filter id="blur"><feGaussianBlur stdDeviation="34"/></filter>
+  </defs>
+  <rect width="1200" height="800" fill="url(#bg)"/>
+  <ellipse cx="920" cy="160" rx="290" ry="160" fill="#67dfff" opacity=".1" filter="url(#blur)" transform="rotate(-18 920 160)"/>
+  <circle cx="900" cy="148" r="84" fill="#d5f8ff" opacity=".82"/>
+  <g fill="none" stroke="url(#sea)" stroke-width="3">
+    <path d="M-50 560c180-85 300 84 470 4s300-82 450 13 280 74 390-6"/>
+    <path d="M-50 620c180-85 300 84 470 4s300-82 450 13 280 74 390-6" opacity=".8"/>
+    <path d="M-50 680c180-85 300 84 470 4s300-82 450 13 280 74 390-6" opacity=".6"/>
+    <path d="M-50 740c180-85 300 84 470 4s300-82 450 13 280 74 390-6" opacity=".4"/>
+  </g>
+  <g fill="none" stroke="#fff" stroke-opacity=".2">
+    <circle cx="246" cy="180" r="120"/>
+    <circle cx="246" cy="180" r="182"/>
+  </g>
+</svg>
