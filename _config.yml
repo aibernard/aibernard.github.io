@@ -3,18 +3,18 @@
 ## Source: https://github.com/hexojs/hexo/
 
 # Site
-title: Hexo
-subtitle: ''
-description: ''
-keywords:
-author: John Doe
-language: en
-timezone: ''
+title: AIBernard
+subtitle: '记录技术、思考与生活'
+description: 'AIBernard 的个人博客，记录技术实践、学习笔记与生活思考。'
+keywords: [AIBernard, Hexo, Butterfly, 前端, 技术博客]
+author: AIBernard
+language: zh-CN
+timezone: 'Asia/Shanghai'
 
 # URL
 ## Set your site url here. For example, if you use GitHub Page, set url as 'https://username.github.io/project'
-url: http://example.com
-permalink: :year/:month/:day/:title/
+url: https://aibernard.github.io
+permalink: posts/:title/
 permalink_defaults:
 pretty_urls:
   trailing_index: true # Set to false to remove trailing 'index.html' from permalinks
@@ -47,11 +47,11 @@ syntax_highlighter: highlight.js
 highlight:
   line_number: true
   auto_detect: false
-  tab_replace: ''
+  tab_replace: '  '
   wrap: true
-  hljs: false
+  hljs: true
 prismjs:
-  preprocess: true
+  preprocess: false
   line_number: true
   tab_replace: ''
 
@@ -96,7 +96,24 @@ ignore:
 # Extensions
 ## Plugins: https://hexo.io/plugins/
 ## Themes: https://hexo.io/themes/
-theme: landscape
+theme: butterfly
+
+# Local search database used by Butterfly
+search:
+  path: search.json
+  field: post
+  content: true
+  format: striptags
+
+# Word count and estimated reading time
+symbols_count_time:
+  symbols: true
+  time: true
+  total_symbols: true
+  total_time: true
+  exclude_codeblock: false
+  wpm: 300
+  suffix: ''
 
 # Deployment
 ## Docs: https://hexo.io/docs/one-command-deployment

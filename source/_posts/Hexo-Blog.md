@@ -3,6 +3,9 @@ title: Hexo-Blog
 date: 2026-10-25 15:03:59
 tags: [教程, Hexo]
 categories: [技术, 前端]
+description: 从本地预览、静态生成到 GitHub Pages 发布，整理 Hexo 博客的核心工作流。
+cover: /img/covers/aurora.svg
+top_img: false
 ---
 
 # 必要组件
