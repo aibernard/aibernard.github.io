@@ -24,7 +24,7 @@
     "hexo-renderer-pug": "^3.0.0",
     "hexo-renderer-stylus": "^3.0.0",
     "hexo-server": "^3.0.0",
-    "hexo-theme-butterfly": "5.6.0",
+    "hexo-theme-butterfly": "5.7.0",
     "hexo-theme-landscape": "^1.0.0",
     "hexo-word-counter": "^0.3.0-rc.1"
   }
