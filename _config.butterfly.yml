@@ -30,8 +30,8 @@ social:
 favicon: /img/favicon.svg
 
 avatar:
-  img: /img/avatar.svg
-  effect: true
+  img: /img/avatar.jpg
+  effect: false
 
 # 参考站采用无大横幅的内容优先布局
 disable_top_img: true

@@ -269,6 +269,10 @@ a {
     0 10px 24px rgba(41, 96, 132, 0.2);
 }
 
+.avatar-img img:hover {
+  transform: none;
+}
+
 #aside-content .card-info #card-info-btn {
   background: linear-gradient(105deg, var(--blog-accent), #55c9e8);
   border-radius: 9px;
