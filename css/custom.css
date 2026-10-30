@@ -269,6 +269,10 @@ a {
     0 10px 24px rgba(41, 96, 132, 0.2);
 }
 
+.avatar-img img:hover {
+  transform: none;
+}
+
 #aside-content .card-info #card-info-btn {
   background: linear-gradient(105deg, var(--blog-accent), #55c9e8);
   border-radius: 9px;
@@ -319,6 +323,24 @@ a {
 
 #article-container img {
   border-radius: 10px;
+}
+
+.clap-demo-frame {
+  display: block;
+  width: 100%;
+  margin: 1.6rem 0 2rem;
+  background: var(--blog-surface-solid);
+  border: 1px solid var(--blog-border);
+  border-radius: 16px;
+  box-shadow: var(--blog-shadow);
+}
+
+.clap-parser-demo {
+  height: 960px;
+}
+
+.clap-attribute-demo {
+  height: 960px;
 }
 
 #article-container blockquote {
@@ -468,6 +490,14 @@ figure.highlight {
 
   #aside-content .card-widget {
     padding: 1.15rem 1.2rem;
+  }
+
+  .clap-parser-demo {
+    height: 1300px;
+  }
+
+  .clap-attribute-demo {
+    height: 1300px;
   }
 }
 

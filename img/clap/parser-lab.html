@@ -1,0 +1,922 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Clap 参数解析实验室</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --page: #eef4fa;
+      --surface: #ffffff;
+      --surface-soft: #f6f9fc;
+      --ink: #172033;
+      --muted: #64748b;
+      --line: #d9e3ef;
+      --blue: #1677c8;
+      --blue-soft: #e7f3ff;
+      --cyan: #0d9488;
+      --cyan-soft: #e4f8f4;
+      --amber: #b45309;
+      --amber-soft: #fff4dd;
+      --red: #c2414b;
+      --red-soft: #fff0f1;
+      --code: #102238;
+      --code-ink: #d8f3ff;
+      --shadow: 0 18px 50px rgba(34, 72, 108, 0.12);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --page: #0c121b;
+        --surface: #151e2b;
+        --surface-soft: #101824;
+        --ink: #edf4fd;
+        --muted: #9bacc1;
+        --line: #2b394b;
+        --blue: #67baf5;
+        --blue-soft: #17324a;
+        --cyan: #5eead4;
+        --cyan-soft: #123a38;
+        --amber: #fbbf24;
+        --amber-soft: #392c15;
+        --red: #fb8790;
+        --red-soft: #3b2025;
+        --code: #091321;
+        --code-ink: #c9f4ff;
+        --shadow: 0 18px 50px rgba(0, 0, 0, 0.3);
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      min-height: 100%;
+    }
+
+    body {
+      margin: 0;
+      padding: 16px;
+      background: var(--page);
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+      line-height: 1.6;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .lab {
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 24px;
+      overflow: hidden;
+      background: var(--surface);
+      background:
+        radial-gradient(circle at 100% 0, color-mix(in srgb, var(--blue) 12%, transparent), transparent 34%),
+        var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .lab-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .eyebrow {
+      margin: 0 0 4px;
+      color: var(--blue);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(22px, 3vw, 30px);
+      line-height: 1.25;
+    }
+
+    .lab-head p:last-child {
+      max-width: 650px;
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .status {
+      flex: 0 0 auto;
+      max-width: 260px;
+      padding: 8px 12px;
+      color: var(--cyan);
+      background: var(--cyan-soft);
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .status.is-error {
+      color: var(--red);
+      background: var(--red-soft);
+    }
+
+    .command-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 10px;
+      padding: 14px;
+      background: var(--surface-soft);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+    }
+
+    .command-field {
+      min-width: 0;
+    }
+
+    .command-field label {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .command-input {
+      width: 100%;
+      min-width: 0;
+      min-height: 46px;
+      padding: 10px 13px;
+      color: var(--ink);
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      outline: none;
+      font-family: "Cascadia Code", Consolas, monospace;
+      font-size: 14px;
+    }
+
+    .command-input:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--blue) 18%, transparent);
+    }
+
+    .run-button {
+      align-self: end;
+      min-height: 46px;
+      padding: 0 20px;
+      color: #fff;
+      background: var(--blue);
+      border: 0;
+      border-radius: 10px;
+      font-weight: 700;
+    }
+
+    .run-button:hover {
+      filter: brightness(1.08);
+    }
+
+    .presets {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 12px 0 18px;
+    }
+
+    .preset {
+      padding: 7px 11px;
+      color: var(--muted);
+      background: transparent;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      font-size: 12px;
+    }
+
+    .preset:hover,
+    .preset:focus-visible {
+      color: var(--blue);
+      border-color: var(--blue);
+    }
+
+    .pipeline {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+
+    .pipe-node {
+      position: relative;
+      min-height: 72px;
+      padding: 10px 12px;
+      color: var(--muted);
+      background: var(--surface-soft);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      font-size: 12px;
+    }
+
+    .pipe-node:not(:last-child)::after {
+      position: absolute;
+      z-index: 1;
+      top: 50%;
+      right: -7px;
+      content: "→";
+      color: var(--blue);
+      transform: translate(50%, -50%);
+    }
+
+    .pipe-node strong {
+      display: block;
+      color: var(--ink);
+      font-size: 13px;
+    }
+
+    .pipe-node.is-complete {
+      color: var(--blue);
+      background: var(--blue-soft);
+      border-color: color-mix(in srgb, var(--blue) 45%, var(--line));
+    }
+
+    .pipe-node.is-error {
+      color: var(--red);
+      background: var(--red-soft);
+      border-color: color-mix(in srgb, var(--red) 45%, var(--line));
+    }
+
+    .panel-title {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 0 0 9px;
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .panel-title span {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 400;
+    }
+
+    .tokens {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      min-height: 45px;
+      margin-bottom: 18px;
+      padding: 12px;
+      background: var(--surface-soft);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+    }
+
+    .token {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      max-width: 100%;
+      padding: 6px 9px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      font-size: 12px;
+    }
+
+    .token code {
+      overflow-wrap: anywhere;
+      color: var(--ink);
+      font-family: "Cascadia Code", Consolas, monospace;
+    }
+
+    .token em {
+      color: var(--muted);
+      font-size: 11px;
+      font-style: normal;
+    }
+
+    .token[data-kind="command"] {
+      border-color: color-mix(in srgb, var(--cyan) 55%, var(--line));
+    }
+
+    .token[data-kind="option"] {
+      border-color: color-mix(in srgb, var(--blue) 55%, var(--line));
+    }
+
+    .token[data-kind="value"],
+    .token[data-kind="positional"] {
+      border-color: color-mix(in srgb, var(--amber) 55%, var(--line));
+    }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.08fr) minmax(260px, 0.92fr);
+      gap: 14px;
+    }
+
+    .result-card {
+      min-width: 0;
+      overflow: hidden;
+      background: var(--surface-soft);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+    }
+
+    .result-card h2 {
+      margin: 0;
+      padding: 11px 13px;
+      border-bottom: 1px solid var(--line);
+      font-size: 13px;
+    }
+
+    .matches {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    .matches th,
+    .matches td {
+      padding: 9px 12px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .matches tr:last-child th,
+    .matches tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .matches th {
+      width: 32%;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .matches code {
+      color: var(--blue);
+      font-family: "Cascadia Code", Consolas, monospace;
+    }
+
+    .rust-output {
+      min-height: 100%;
+      margin: 0;
+      padding: 13px;
+      overflow: auto;
+      color: var(--code-ink);
+      background: var(--code);
+      font: 12px/1.7 "Cascadia Code", Consolas, monospace;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    .message {
+      display: none;
+      margin: 14px 0 0;
+      padding: 11px 13px;
+      color: var(--red);
+      background: var(--red-soft);
+      border-left: 3px solid var(--red);
+      border-radius: 0 8px 8px 0;
+      font-size: 13px;
+      white-space: pre-wrap;
+    }
+
+    .message.is-visible {
+      display: block;
+    }
+
+    .footnote {
+      margin: 14px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    @media (max-width: 700px) {
+      body {
+        padding: 9px;
+      }
+
+      .lab {
+        padding: 16px;
+        border-radius: 15px;
+      }
+
+      .lab-head {
+        display: block;
+      }
+
+      .status {
+        display: inline-block;
+        margin-top: 12px;
+        text-align: left;
+      }
+
+      .command-row,
+      .result-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .run-button {
+        width: 100%;
+      }
+
+      .pipeline {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .pipe-node:not(:last-child)::after {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <section class="lab" id="parser-lab" aria-labelledby="parser-lab-title">
+    <div class="lab-head">
+      <div>
+        <p class="eyebrow">INTERACTIVE PARSER</p>
+        <h1 id="parser-lab-title">亲手跑一遍 Clap 的解析流程</h1>
+        <p>修改下方命令并点击解析。这里用简化教学模型演示 clap 的主要步骤，不替代真实 crate 的全部边界行为。</p>
+      </div>
+      <div class="status" id="status" role="status" aria-live="polite">解析成功 · 等待输入</div>
+    </div>
+
+    <div class="command-row">
+      <div class="command-field">
+        <label for="command-input">模拟命令</label>
+        <input class="command-input" id="command-input" value="demo --name Alice -vv --format json -o out.txt notes.md" spellcheck="false" autocomplete="off">
+      </div>
+      <button class="run-button" id="run-button" type="button">开始解析</button>
+    </div>
+
+    <div class="presets" aria-label="示例命令">
+      <button class="preset" type="button" data-command="demo --name Alice -vv --format json -o out.txt notes.md">长选项 + 短选项簇</button>
+      <button class="preset" type="button" data-command="demo -c 3 -fjson -oout.txt --name &quot;Ada Lovelace&quot; notes.md">紧凑短参数与引号</button>
+      <button class="preset" type="button" data-command="demo --count 99 --format xml">触发校验错误</button>
+      <button class="preset" type="button" data-command="demo -- --not-an-option.md">用 -- 保护文件名</button>
+    </div>
+
+    <div class="pipeline" aria-label="解析流水线">
+      <div class="pipe-node" data-stage="tokenize"><strong>1. 拆分</strong>Shell 产出 token</div>
+      <div class="pipe-node" data-stage="match"><strong>2. 匹配</strong>长选项、短选项、位置</div>
+      <div class="pipe-node" data-stage="route"><strong>3. 路由</strong>子命令或当前作用域</div>
+      <div class="pipe-node" data-stage="validate"><strong>4. 校验</strong>必填、冲突、类型</div>
+      <div class="pipe-node" data-stage="typed"><strong>5. 构造</strong>生成强类型结构体</div>
+    </div>
+
+    <p class="panel-title">Token 列表 <span>颜色只表示解析角色</span></p>
+    <div class="tokens" id="tokens" aria-label="参数拆分结果"></div>
+
+    <div class="result-grid">
+      <div class="result-card">
+        <h2>ArgMatches 的抽象视角</h2>
+        <table class="matches">
+          <thead class="sr-only">
+            <tr><th scope="col">参数</th><th scope="col">解析结果</th></tr>
+          </thead>
+          <tbody id="matches-body"></tbody>
+        </table>
+      </div>
+      <div class="result-card">
+        <h2>最终得到的 Rust 值</h2>
+        <pre class="rust-output" id="rust-output"></pre>
+      </div>
+    </div>
+
+    <p class="message" id="error-message" role="alert"></p>
+    <p class="footnote">规则：<code>--count</code> 范围 1–5；<code>--format</code> 只接受 text、json、csv；<code>file</code> 必填；<code>-v</code> 可重复计数。</p>
+  </section>
+
+  <script>
+    (() => {
+      const root = document.getElementById("parser-lab");
+      const input = document.getElementById("command-input");
+      const runButton = document.getElementById("run-button");
+      const tokensEl = document.getElementById("tokens");
+      const matchesBody = document.getElementById("matches-body");
+      const rustOutput = document.getElementById("rust-output");
+      const statusEl = document.getElementById("status");
+      const errorEl = document.getElementById("error-message");
+      const stages = [...root.querySelectorAll("[data-stage]")];
+
+      const longArgs = {
+        name: { key: "name", takesValue: true, parser: "String" },
+        count: { key: "count", takesValue: true, parser: "u32" },
+        verbose: { key: "verbose", takesValue: false, parser: "SetTrue / Count" },
+        format: { key: "format", takesValue: true, parser: "ValueEnum" },
+        output: { key: "output", takesValue: true, parser: "PathBuf" },
+        help: { key: "help", takesValue: false, parser: "help" }
+      };
+
+      const shortArgs = {
+        n: longArgs.name,
+        c: longArgs.count,
+        v: longArgs.verbose,
+        f: longArgs.format,
+        o: longArgs.output,
+        h: { key: "help", takesValue: false, parser: "help" }
+      };
+
+      const tokenize = (source) => {
+        const tokens = [];
+        let current = "";
+        let quote = null;
+        let escaped = false;
+
+        for (const char of source) {
+          if (escaped) {
+            current += char;
+            escaped = false;
+            continue;
+          }
+
+          if (char === "\\" && quote !== "'") {
+            escaped = true;
+            continue;
+          }
+
+          if (quote) {
+            if (char === quote) {
+              quote = null;
+            } else {
+              current += char;
+            }
+            continue;
+          }
+
+          if (char === "\"" || char === "'") {
+            quote = char;
+            continue;
+          }
+
+          if (/\s/.test(char)) {
+            if (current) {
+              tokens.push(current);
+              current = "";
+            }
+            continue;
+          }
+
+          current += char;
+        }
+
+        if (quote) throw new Error("引号没有闭合。");
+        if (escaped) throw new Error("输入末尾的转义符没有对应字符。");
+        if (current) tokens.push(current);
+        return tokens;
+      };
+
+      const pretty = (value) => {
+        if (value === null || value === undefined) return "None";
+        if (typeof value === "string") return `Some("${value.replaceAll("\"", "\\\"")}")`;
+        return JSON.stringify(value);
+      };
+
+      const parse = (source) => {
+        const tokens = tokenize(source);
+        if (tokens.length === 0) throw new Error("请输入一条命令。");
+        if (tokens[0] !== "demo") throw new Error(`当前实验的命令名必须是 demo，实际收到：${tokens[0]}`);
+
+        const state = {
+          name: "Ferris",
+          nameSource: "默认值",
+          count: 1,
+          countSource: "默认值",
+          verbose: 0,
+          format: "text",
+          formatSource: "默认值",
+          output: null,
+          file: null,
+          help: false
+        };
+
+        const steps = [{ text: tokens[0], kind: "command", role: "命令名" }];
+        let i = 1;
+        let optionsEnded = false;
+        let sawVerbose = false;
+
+        const readValue = (inlineValue, optionLabel) => {
+          if (inlineValue !== null) {
+            if (inlineValue === "") throw new Error(`${optionLabel} 后面的值不能为空。`);
+            return { value: inlineValue, next: i };
+          }
+          if (i + 1 >= tokens.length) throw new Error(`${optionLabel} 需要一个值。`);
+          i += 1;
+          return { value: tokens[i], next: i };
+        };
+
+        const assignValue = (rule, value) => {
+          if (rule.key === "count") {
+            if (!/^\d+$/.test(value)) throw new Error(`--count 需要正整数，收到“${value}”。`);
+            const count = Number(value);
+            if (count < 1 || count > 5) throw new Error(`--count 必须在 1..=5 内，收到 ${value}。`);
+            state.count = count;
+            state.countSource = "命令行";
+            return;
+          }
+
+          if (rule.key === "format") {
+            const format = value.toLowerCase();
+            if (!["text", "json", "csv"].includes(format)) {
+              throw new Error(`--format 收到“${value}”，可选值是 text、json、csv。`);
+            }
+            state.format = format;
+            state.formatSource = "命令行";
+            return;
+          }
+
+          if (rule.key === "name") {
+            state.name = value;
+            state.nameSource = "命令行";
+            return;
+          }
+
+          if (rule.key === "output") {
+            state.output = value;
+          }
+        };
+
+        while (i < tokens.length) {
+          const token = tokens[i];
+
+          if (!optionsEnded && token === "--") {
+            steps.push({ text: token, kind: "separator", role: "停止解析选项" });
+            optionsEnded = true;
+            i += 1;
+            continue;
+          }
+
+          if (!optionsEnded && token.startsWith("--") && token.length > 2) {
+            const equalsAt = token.indexOf("=");
+            const name = token.slice(2, equalsAt === -1 ? undefined : equalsAt);
+            const rule = longArgs[name];
+            if (!rule) throw new Error(`未知长选项 --${name}。`);
+
+            if (!rule.takesValue) {
+              steps.push({ text: token, kind: "option", role: `--${name} 开关` });
+              if (rule.key === "help") {
+                state.help = true;
+                i = tokens.length;
+                continue;
+              }
+              if (rule.key === "verbose") {
+                state.verbose += 1;
+                sawVerbose = true;
+              }
+              i += 1;
+              continue;
+            }
+
+            const inlineValue = equalsAt === -1 ? null : token.slice(equalsAt + 1);
+            const consumed = readValue(inlineValue, `--${name}`);
+            assignValue(rule, consumed.value);
+            steps.push({
+              text: token,
+              kind: "option",
+              role: equalsAt === -1 ? `--${name} 需要值` : `--${name} 内联值`
+            });
+            if (equalsAt === -1) {
+              steps.push({ text: consumed.value, kind: "value", role: `--${name} 的值` });
+            }
+            i += 1;
+            continue;
+          }
+
+          if (!optionsEnded && token.startsWith("-") && token !== "-") {
+            const cluster = token.slice(1);
+            let recognizedFlags = 0;
+
+            for (let j = 0; j < cluster.length; j += 1) {
+              const shortName = cluster[j];
+              const rule = shortArgs[shortName];
+              if (!rule) throw new Error(`未知短选项 -${shortName}（来自 ${token}）。`);
+
+              if (rule.key === "help") {
+                state.help = true;
+                steps.push({ text: token, kind: "option", role: "-h 帮助" });
+                i = tokens.length;
+                break;
+              }
+
+              if (!rule.takesValue) {
+                recognizedFlags += 1;
+                if (rule.key === "verbose") {
+                  state.verbose += 1;
+                  sawVerbose = true;
+                }
+                continue;
+              }
+
+              let attached = cluster.slice(j + 1);
+              if (attached.startsWith("=")) attached = attached.slice(1);
+              let value = attached;
+              if (!value) {
+                if (i + 1 >= tokens.length) throw new Error(`-${shortName} 需要一个值。`);
+                i += 1;
+                value = tokens[i];
+              }
+
+              assignValue(rule, value);
+              steps.push({
+                text: token,
+                kind: "option",
+                role: attached ? `-${shortName} 紧凑取值` : `-${shortName} 需要值`
+              });
+              if (!attached) {
+                steps.push({ text: value, kind: "value", role: `-${shortName} 的值` });
+              }
+              recognizedFlags = 0;
+              j = cluster.length;
+            }
+
+            if (recognizedFlags > 0) {
+              steps.push({
+                text: token,
+                kind: "option",
+                role: recognizedFlags === 1 ? "短选项" : `短选项簇 ×${recognizedFlags}`
+              });
+            }
+            i += 1;
+            continue;
+          }
+
+          if (state.file === null) {
+            state.file = token;
+            steps.push({ text: token, kind: "positional", role: "位置参数 file" });
+          } else {
+            throw new Error(`多余的位置参数“${token}”。当前命令只接受一个 FILE。`);
+          }
+          i += 1;
+        }
+
+        if (!state.help && !state.file) {
+          throw new Error("缺少必填位置参数 FILE。示例：demo notes.md");
+        }
+
+        if (sawVerbose && state.verbose === 0) {
+          state.verbose = 1;
+        }
+
+        return { state, steps };
+      };
+
+      const addMatchRow = (key, value, meta) => {
+        const row = document.createElement("tr");
+        const keyCell = document.createElement("th");
+        const valueCell = document.createElement("td");
+        const code = document.createElement("code");
+        const detail = document.createElement("div");
+
+        keyCell.textContent = key;
+        code.textContent = value;
+        detail.textContent = meta;
+        detail.style.color = "var(--muted)";
+        detail.style.fontSize = "11px";
+        valueCell.append(code, detail);
+        row.append(keyCell, valueCell);
+        matchesBody.append(row);
+      };
+
+      const renderMatches = (state) => {
+        matchesBody.replaceChildren();
+        addMatchRow("name", state.name, `${state.nameSource} · value_parser!(String)`);
+        addMatchRow("count", String(state.count), `${state.countSource} · 1..=5`);
+        addMatchRow("verbose", String(state.verbose), "ArgAction::Count");
+        addMatchRow("format", state.format, `${state.formatSource} · ValueEnum`);
+        addMatchRow("output", state.output ?? "None", "Option<PathBuf>");
+        addMatchRow("file", state.file ?? "None", "位置参数 · 必填");
+      };
+
+      const renderSteps = (steps) => {
+        tokensEl.replaceChildren();
+        steps.forEach((step) => {
+          const item = document.createElement("span");
+          const code = document.createElement("code");
+          const role = document.createElement("em");
+          item.className = "token";
+          item.dataset.kind = step.kind;
+          code.textContent = step.text;
+          role.textContent = step.role;
+          item.append(code, role);
+          tokensEl.append(item);
+        });
+      };
+
+      const setStages = (state) => {
+        stages.forEach((stage) => {
+          stage.classList.remove("is-complete", "is-error");
+          const isError = state === "error";
+          stage.classList.add(isError && stage.dataset.stage === "validate" ? "is-error" : "is-complete");
+        });
+      };
+
+      const renderHelp = () => {
+        const help = [
+          "demo 0.1.0",
+          "一个用于学习 Clap 的示例程序",
+          "",
+          "Usage: demo [OPTIONS] <FILE>",
+          "",
+          "Arguments:",
+          "  <FILE>  要处理的文件",
+          "",
+          "Options:",
+          "  -n, --name <NAME>      [default: Ferris]",
+          "  -c, --count <COUNT>    [default: 1]",
+          "  -v, --verbose...       可重复",
+          "  -f, --format <FORMAT>  [default: text] [possible values: text, json, csv]",
+          "  -o, --output <OUTPUT>",
+          "  -h, --help             打印帮助"
+        ].join("\n");
+        rustOutput.textContent = help;
+        matchesBody.replaceChildren();
+        addMatchRow("help", "true", "clap 内建帮助分支");
+      };
+
+      const run = () => {
+        errorEl.classList.remove("is-visible");
+        errorEl.textContent = "";
+        statusEl.classList.remove("is-error");
+
+        try {
+          const { state, steps } = parse(input.value.trim());
+          renderSteps(steps);
+          setStages("success");
+          statusEl.textContent = state.help ? "已触发帮助输出" : "解析成功 · 数据已转为强类型";
+
+          if (state.help) {
+            renderHelp();
+            return;
+          }
+
+          renderMatches(state);
+          rustOutput.textContent = [
+            "DemoArgs {",
+            `    name: "${state.name}",`,
+            `    count: ${state.count},`,
+            `    verbose: ${state.verbose},`,
+            `    format: Format::${state.format[0].toUpperCase() + state.format.slice(1)},`,
+            `    output: ${pretty(state.output)},`,
+            `    file: PathBuf::from("${state.file}"),`,
+            "}"
+          ].join("\n");
+        } catch (error) {
+          renderSteps([{ text: input.value.trim() || "（空输入）", kind: "positional", role: "解析失败" }]);
+          setStages("error");
+          statusEl.textContent = "解析失败 · 请检查参数";
+          statusEl.classList.add("is-error");
+          errorEl.textContent = error.message;
+          errorEl.classList.add("is-visible");
+          matchesBody.replaceChildren();
+          rustOutput.textContent = "// 解析在生成 DemoArgs 之前停止";
+        }
+      };
+
+      runButton.addEventListener("click", run);
+      input.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") run();
+      });
+
+      root.querySelectorAll("[data-command]").forEach((button) => {
+        button.addEventListener("click", () => {
+          input.value = button.dataset.command;
+          input.focus();
+          run();
+        });
+      });
+
+      run();
+    })();
+  </script>
+</body>
+</html>

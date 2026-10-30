@@ -1,0 +1,109 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 610" role="img" aria-labelledby="type-title type-desc">
+  <title id="type-title">Clap 字段类型如何影响参数行为</title>
+  <desc id="type-desc">String 默认必填，Option 表示可选，bool 是开关，计数使用 u8 与 ArgAction Count，Vec 收集多个值，PathBuf 走路径解析，ValueEnum 限制枚举候选。</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#111827"/>
+      <stop offset="1" stop-color="#172136"/>
+    </linearGradient>
+    <style>
+      .title { fill: #f8fafc; font: 700 28px "Microsoft YaHei", "PingFang SC", sans-serif; }
+      .subtitle { fill: #aab8cb; font: 400 15px "Microsoft YaHei", "PingFang SC", sans-serif; }
+      .type { fill: #e0f2fe; font: 700 20px "Cascadia Code", Consolas, monospace; }
+      .tag { fill: #94a3b8; font: 400 12px "Microsoft YaHei", "PingFang SC", sans-serif; }
+      .body { fill: #d5deeb; font: 400 13px "Microsoft YaHei", "PingFang SC", sans-serif; }
+      .code { fill: #7dd3fc; font: 500 12px "Cascadia Code", Consolas, monospace; }
+      .caption { fill: #7f8da3; font: 400 12px "Microsoft YaHei", "PingFang SC", sans-serif; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="610" rx="24" fill="url(#bg)"/>
+  <circle cx="1090" cy="36" r="170" fill="#38bdf8" opacity="0.05"/>
+  <text class="title" x="44" y="58">字段类型，就是大部分参数规则的第一来源</text>
+  <text class="subtitle" x="44" y="88">先让类型表达意图，再用 #[arg(...)] 补充命令行长什么样</text>
+  <path d="M44 112H1156" stroke="#2c405c"/>
+
+  <g transform="translate(40 138)">
+    <rect width="216" height="216" rx="16" fill="#142338" stroke="#2e4a69"/>
+    <text class="type" x="20" y="40">String</text>
+    <rect x="20" y="58" width="90" height="25" rx="12.5" fill="#7c2d12" opacity="0.58"/>
+    <text x="65" y="75" text-anchor="middle" class="tag">必填值</text>
+    <text class="body" x="20" y="110">没有值就报错；</text>
+    <text class="body" x="20" y="132">读取一个 UTF-8 字符串。</text>
+    <text class="code" x="20" y="169">--name Alice</text>
+    <text class="caption" x="20" y="198">适合名称、ID、短文本</text>
+  </g>
+
+  <g transform="translate(276 138)">
+    <rect width="216" height="216" rx="16" fill="#142338" stroke="#2e4a69"/>
+    <text class="type" x="20" y="40">Option&lt;T&gt;</text>
+    <rect x="20" y="58" width="90" height="25" rx="12.5" fill="#14532d" opacity="0.65"/>
+    <text x="65" y="75" text-anchor="middle" class="tag">可选值</text>
+    <text class="body" x="20" y="110">没写就是 None；</text>
+    <text class="body" x="20" y="132">写了才消费一个值。</text>
+    <text class="code" x="20" y="169">--output a.txt</text>
+    <text class="caption" x="20" y="198">不会自动给默认值</text>
+  </g>
+
+  <g transform="translate(512 138)">
+    <rect width="216" height="216" rx="16" fill="#142338" stroke="#2e4a69"/>
+    <text class="type" x="20" y="40">bool</text>
+    <rect x="20" y="58" width="90" height="25" rx="12.5" fill="#164e63" opacity="0.75"/>
+    <text x="65" y="75" text-anchor="middle" class="tag">开关</text>
+    <text class="body" x="20" y="110">默认 SetTrue；</text>
+    <text class="body" x="20" y="132">出现即 true，无需 true 参数。</text>
+    <text class="code" x="20" y="169">--verbose</text>
+    <text class="caption" x="20" y="198">不要写 --verbose true</text>
+  </g>
+
+  <g transform="translate(748 138)">
+    <rect width="200" height="216" rx="16" fill="#142338" stroke="#2e4a69"/>
+    <text class="type" x="20" y="40">u8</text>
+    <rect x="20" y="58" width="102" height="25" rx="12.5" fill="#4c1d95" opacity="0.7"/>
+    <text x="71" y="75" text-anchor="middle" class="tag">Count</text>
+    <text class="body" x="20" y="110">用 action 显式</text>
+    <text class="body" x="20" y="132">声明计数语义。</text>
+    <text class="code" x="20" y="169">-v / -vv / -vvv</text>
+    <text class="caption" x="20" y="198">适合日志级别</text>
+  </g>
+
+  <g transform="translate(968 138)">
+    <rect width="192" height="216" rx="16" fill="#142338" stroke="#2e4a69"/>
+    <text class="type" x="20" y="40">Vec&lt;T&gt;</text>
+    <rect x="20" y="58" width="96" height="25" rx="12.5" fill="#713f12" opacity="0.75"/>
+    <text x="68" y="75" text-anchor="middle" class="tag">Append</text>
+    <text class="body" x="20" y="110">出现多次就追加；</text>
+    <text class="body" x="20" y="132">没出现是空 Vec。</text>
+    <text class="code" x="18" y="169">-t rust -t cli</text>
+    <text class="caption" x="20" y="198">适合标签、路径集合</text>
+  </g>
+
+  <g transform="translate(40 388)">
+    <rect width="360" height="166" rx="16" fill="#132c35" stroke="#26717a"/>
+    <text class="type" x="22" y="41">PathBuf</text>
+    <text class="body" x="22" y="76">使用文件系统路径类型，</text>
+    <text class="body" x="22" y="100">比 String 更清楚，也更适合</text>
+    <text class="body" x="22" y="124">跨平台路径处理。</text>
+    <text class="code" x="22" y="151">#[arg(value_name = "FILE")]</text>
+  </g>
+
+  <g transform="translate(420 388)">
+    <rect width="360" height="166" rx="16" fill="#132c35" stroke="#26717a"/>
+    <text class="type" x="22" y="41">Enum + ValueEnum</text>
+    <text class="body" x="22" y="76">把允许值限定为枚举变体，</text>
+    <text class="body" x="22" y="100">非法输入在解析阶段就会被</text>
+    <text class="body" x="22" y="124">clap 拦下并给出候选。</text>
+    <text class="code" x="22" y="151">--format json | yaml | text</text>
+  </g>
+
+  <g transform="translate(800 388)">
+    <rect width="360" height="166" rx="16" fill="#132c35" stroke="#26717a"/>
+    <text class="type" x="22" y="41">value_parser</text>
+    <text class="body" x="22" y="76">负责把原始 OsStr 转为业务</text>
+    <text class="body" x="22" y="100">类型，也可以附加范围校验。</text>
+    <text class="body" x="22" y="124">失败时返回可读错误。</text>
+    <text class="code" x="22" y="151">value_parser!(u16).range(1..)</text>
+  </g>
+
+  <text class="caption" x="40" y="585">记忆法：类型决定“是否必须有值”，属性决定“参数名、动作与校验细节”。</text>
+</svg>

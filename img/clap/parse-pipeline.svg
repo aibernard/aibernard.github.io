@@ -1,0 +1,153 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 560" role="img" aria-labelledby="pipeline-title pipeline-desc">
+  <title id="pipeline-title">Clap 参数解析流水线</title>
+  <desc id="pipeline-desc">Shell 把输入拆成字符串参数；clap 根据 Command 和 Arg 规则扫描参数、处理子命令、保存到 ArgMatches，最后 Derive 生成的代码构造强类型结构体。</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#101827"/>
+      <stop offset="1" stop-color="#17233a"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" x2="1">
+      <stop offset="0" stop-color="#38bdf8"/>
+      <stop offset="1" stop-color="#2dd4bf"/>
+    </linearGradient>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#7dd3fc"/>
+    </marker>
+    <style>
+      .title { fill: #f8fafc; font: 700 30px "Microsoft YaHei", "PingFang SC", sans-serif; }
+      .subtitle { fill: #a9b7cc; font: 400 15px "Microsoft YaHei", "PingFang SC", sans-serif; }
+      .card-title { fill: #f8fafc; font: 700 17px "Microsoft YaHei", "PingFang SC", sans-serif; }
+      .label { fill: #9fb0c8; font: 400 12px "Microsoft YaHei", "PingFang SC", sans-serif; }
+      .code { fill: #d9f8ff; font: 500 12px "Cascadia Code", Consolas, monospace; }
+      .chip { fill: #22334c; stroke: #37516f; }
+      .note { fill: #c8d5e6; font: 400 13px "Microsoft YaHei", "PingFang SC", sans-serif; }
+      .stage { fill: #162237; stroke: #2b405d; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="560" rx="24" fill="url(#bg)"/>
+  <circle cx="1080" cy="72" r="150" fill="#38bdf8" opacity="0.05"/>
+  <circle cx="130" cy="525" r="170" fill="#2dd4bf" opacity="0.04"/>
+  <path d="M40 115H1160" stroke="#2d4260" stroke-width="1"/>
+
+  <text class="title" x="44" y="62">一次命令行调用，经历了什么？</text>
+  <text class="subtitle" x="44" y="91">Clap 的核心工作：定义规则 → 扫描参数 → 校验转换 → 生成配置</text>
+
+  <g transform="translate(40 144)">
+    <rect width="196" height="292" rx="18" fill="#152238" stroke="#2f4867"/>
+    <circle cx="28" cy="28" r="15" fill="#0ea5e9" opacity="0.18"/>
+    <text x="28" y="33" text-anchor="middle" fill="#7dd3fc" font-size="14" font-weight="700">01</text>
+    <text class="card-title" x="52" y="34">Shell 拆分</text>
+    <text class="label" x="22" y="66">引号、空格与转义先由 shell 处理</text>
+    <g transform="translate(20 89)">
+      <rect class="chip" width="154" height="30" rx="7"/>
+      <text class="code" x="12" y="20">demo</text>
+      <rect class="chip" y="40" width="154" height="30" rx="7"/>
+      <text class="code" x="12" y="60">--name Alice</text>
+      <rect class="chip" y="80" width="154" height="30" rx="7"/>
+      <text class="code" x="12" y="100">-vv</text>
+      <rect class="chip" y="120" width="154" height="30" rx="7"/>
+      <text class="code" x="12" y="140">notes.md</text>
+    </g>
+    <text class="label" x="20" y="274">程序拿到的是字符串序列</text>
+  </g>
+
+  <path d="M240 290H276" stroke="#7dd3fc" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <g transform="translate(280 144)">
+    <rect width="196" height="292" rx="18" fill="#152238" stroke="#2f4867"/>
+    <circle cx="28" cy="28" r="15" fill="#8b5cf6" opacity="0.2"/>
+    <text x="28" y="33" text-anchor="middle" fill="#c4b5fd" font-size="14" font-weight="700">02</text>
+    <text class="card-title" x="52" y="34">定义规则</text>
+    <text class="label" x="22" y="66">Parser 从结构体与属性读取元数据</text>
+    <g transform="translate(20 92)">
+      <rect x="0" y="0" width="156" height="36" rx="8" fill="#1d3049" stroke="#355172"/>
+      <text class="code" x="12" y="23">--name &lt;NAME&gt;</text>
+      <rect x="0" y="46" width="156" height="36" rx="8" fill="#1d3049" stroke="#355172"/>
+      <text class="code" x="12" y="69">-v  count</text>
+      <rect x="0" y="92" width="156" height="36" rx="8" fill="#1d3049" stroke="#355172"/>
+      <text class="code" x="12" y="115">&lt;FILE&gt; required</text>
+    </g>
+    <text class="label" x="20" y="253">Command = 命令树</text>
+    <text class="label" x="20" y="274">Arg = 单个参数规则</text>
+  </g>
+
+  <path d="M480 290H516" stroke="#7dd3fc" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <g transform="translate(520 144)">
+    <rect width="196" height="292" rx="18" fill="#152238" stroke="#3c6883" stroke-width="1.5"/>
+    <circle cx="28" cy="28" r="15" fill="#22d3ee" opacity="0.18"/>
+    <text x="28" y="33" text-anchor="middle" fill="#67e8f9" font-size="14" font-weight="700">03</text>
+    <text class="card-title" x="52" y="34">扫描与路由</text>
+    <text class="label" x="22" y="66">识别前缀、值、位置参数与子命令</text>
+    <g transform="translate(20 91)">
+      <rect x="0" y="0" width="156" height="32" rx="7" fill="#17364b"/>
+      <text class="code" x="12" y="21">“--” → 长选项</text>
+      <rect x="0" y="42" width="156" height="32" rx="7" fill="#17364b"/>
+      <text class="code" x="12" y="63">“-”  → 短选项簇</text>
+      <rect x="0" y="84" width="156" height="32" rx="7" fill="#17364b"/>
+      <text class="code" x="12" y="105">裸单词 → 子命令/位置</text>
+      <rect x="0" y="126" width="156" height="32" rx="7" fill="#17364b"/>
+      <text class="code" x="12" y="147">“--” → 停止选项解析</text>
+    </g>
+    <text class="label" x="20" y="253">同时检查必填、冲突与取值范围</text>
+  </g>
+
+  <path d="M720 290H756" stroke="#7dd3fc" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <g transform="translate(760 144)">
+    <rect width="196" height="292" rx="18" fill="#152238" stroke="#2f4867"/>
+    <circle cx="28" cy="28" r="15" fill="#f59e0b" opacity="0.18"/>
+    <text x="28" y="33" text-anchor="middle" fill="#fcd34d" font-size="14" font-weight="700">04</text>
+    <text class="card-title" x="52" y="34">ArgMatches</text>
+    <text class="label" x="22" y="66">解析结果的中间层：动态键值表</text>
+    <g transform="translate(20 91)">
+      <rect x="0" y="0" width="156" height="30" rx="6" fill="#1d3049" stroke="#355172"/>
+      <text class="code" x="10" y="20">name → Alice</text>
+      <rect x="0" y="39" width="156" height="30" rx="6" fill="#1d3049" stroke="#355172"/>
+      <text class="code" x="10" y="59">verbose → 2</text>
+      <rect x="0" y="78" width="156" height="30" rx="6" fill="#1d3049" stroke="#355172"/>
+      <text class="code" x="10" y="98">format → json</text>
+      <rect x="0" y="117" width="156" height="30" rx="6" fill="#1d3049" stroke="#355172"/>
+      <text class="code" x="10" y="137">file → notes.md</text>
+    </g>
+    <text class="label" x="20" y="253">保留值的来源、出现次数等信息</text>
+  </g>
+
+  <path d="M960 290H996" stroke="#7dd3fc" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <g transform="translate(1000 144)">
+    <rect width="160" height="292" rx="18" fill="#122f37" stroke="#2dd4bf" stroke-width="1.5" filter="url(#glow)"/>
+    <circle cx="28" cy="28" r="15" fill="#2dd4bf" opacity="0.24"/>
+    <text x="28" y="33" text-anchor="middle" fill="#99f6e4" font-size="14" font-weight="700">05</text>
+    <text class="card-title" x="52" y="34">强类型 CLI</text>
+    <text class="label" x="18" y="66">Derive 代码构建结构体</text>
+    <g transform="translate(15 88)">
+      <rect width="130" height="150" rx="10" fill="#0e2832" stroke="#256c73"/>
+      <text class="code" x="10" y="20">Cli {</text>
+      <text class="code" x="10" y="42">name:</text>
+      <text class="code" x="20" y="61">Some(“Alice”),</text>
+      <text class="code" x="10" y="84">verbose: 2,</text>
+      <text class="code" x="10" y="107">format:</text>
+      <text class="code" x="20" y="126">Json,</text>
+      <text class="code" x="10" y="145">}</text>
+    </g>
+    <text class="label" x="18" y="264">业务层只处理强类型数据</text>
+  </g>
+
+  <g transform="translate(40 468)">
+    <rect class="stage" width="1120" height="48" rx="12"/>
+    <text class="note" x="20" y="29">操作系统 / Shell</text>
+    <text class="note" x="247" y="29">clap_derive · 编译期</text>
+    <text class="note" x="510" y="29">clap_builder · 运行期</text>
+    <text class="note" x="778" y="29">ArgMatches</text>
+    <text class="note" x="985" y="29">你的 Rust 代码</text>
+  </g>
+</svg>
