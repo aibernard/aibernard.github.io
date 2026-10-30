@@ -325,6 +325,24 @@ a {
   border-radius: 10px;
 }
 
+.clap-demo-frame {
+  display: block;
+  width: 100%;
+  margin: 1.6rem 0 2rem;
+  background: var(--blog-surface-solid);
+  border: 1px solid var(--blog-border);
+  border-radius: 16px;
+  box-shadow: var(--blog-shadow);
+}
+
+.clap-parser-demo {
+  height: 960px;
+}
+
+.clap-attribute-demo {
+  height: 960px;
+}
+
 #article-container blockquote {
   border-radius: 0 10px 10px 0;
 }
@@ -472,6 +490,14 @@ figure.highlight {
 
   #aside-content .card-widget {
     padding: 1.15rem 1.2rem;
+  }
+
+  .clap-parser-demo {
+    height: 1300px;
+  }
+
+  .clap-attribute-demo {
+    height: 1300px;
   }
 }
 

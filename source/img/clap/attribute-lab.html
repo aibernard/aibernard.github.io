@@ -1,0 +1,500 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Clap 属性配方实验室</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --page: #edf4fa;
+      --surface: #ffffff;
+      --surface-soft: #f5f8fb;
+      --ink: #172033;
+      --muted: #65768c;
+      --line: #d8e3ee;
+      --blue: #1677c8;
+      --blue-soft: #e8f3ff;
+      --green: #0f8a72;
+      --green-soft: #e7f8f3;
+      --amber: #b45309;
+      --amber-soft: #fff3dc;
+      --code: #102238;
+      --code-ink: #d8f3ff;
+      --shadow: 0 18px 50px rgba(34, 72, 108, 0.12);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --page: #0c121b;
+        --surface: #151e2b;
+        --surface-soft: #101824;
+        --ink: #edf4fd;
+        --muted: #9bacc1;
+        --line: #2b394b;
+        --blue: #67baf5;
+        --blue-soft: #17324a;
+        --green: #5eead4;
+        --green-soft: #123a38;
+        --amber: #fbbf24;
+        --amber-soft: #392c15;
+        --code: #091321;
+        --code-ink: #c9f4ff;
+        --shadow: 0 18px 50px rgba(0, 0, 0, 0.3);
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 16px;
+      background: var(--page);
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+      line-height: 1.6;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .lab {
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 24px;
+      overflow: hidden;
+      background: var(--surface);
+      background:
+        radial-gradient(circle at 96% 0, color-mix(in srgb, var(--green) 12%, transparent), transparent 32%),
+        var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .eyebrow {
+      margin: 0 0 4px;
+      color: var(--green);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(22px, 3vw, 30px);
+      line-height: 1.25;
+    }
+
+    .intro {
+      max-width: 720px;
+      margin: 8px 0 20px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .recipes {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+
+    .recipe {
+      min-height: 62px;
+      padding: 10px 11px;
+      color: var(--muted);
+      background: var(--surface-soft);
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .recipe strong {
+      display: block;
+      color: var(--ink);
+      font-size: 13px;
+    }
+
+    .recipe span {
+      font-size: 11px;
+    }
+
+    .recipe:hover,
+    .recipe:focus-visible {
+      border-color: var(--green);
+    }
+
+    .recipe[aria-pressed="true"] {
+      color: var(--green);
+      background: var(--green-soft);
+      border-color: color-mix(in srgb, var(--green) 60%, var(--line));
+      box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--green) 30%, transparent);
+    }
+
+    .recipe[aria-pressed="true"] strong {
+      color: var(--green);
+    }
+
+    .inspector {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(280px, 0.95fr);
+      gap: 14px;
+    }
+
+    .pane {
+      min-width: 0;
+      overflow: hidden;
+      background: var(--surface-soft);
+      border: 1px solid var(--line);
+      border-radius: 13px;
+    }
+
+    .pane-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      min-height: 44px;
+      padding: 9px 13px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .pane-head h2 {
+      margin: 0;
+      font-size: 13px;
+    }
+
+    .badge {
+      padding: 3px 8px;
+      color: var(--blue);
+      background: var(--blue-soft);
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    pre {
+      min-height: 160px;
+      margin: 0;
+      padding: 14px;
+      overflow: auto;
+      color: var(--code-ink);
+      background: var(--code);
+      font: 12px/1.72 "Cascadia Code", Consolas, monospace;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    .details {
+      padding: 13px;
+    }
+
+    .detail-title {
+      margin: 0 0 7px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 0 0 16px;
+    }
+
+    .chip {
+      padding: 4px 8px;
+      color: var(--green);
+      background: var(--green-soft);
+      border-radius: 6px;
+      font-size: 11px;
+    }
+
+    .chips .chip:nth-child(even) {
+      color: var(--amber);
+      background: var(--amber-soft);
+    }
+
+    .example {
+      display: block;
+      margin: 0 0 14px;
+      padding: 9px 10px;
+      color: var(--ink);
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      font: 12px/1.55 "Cascadia Code", Consolas, monospace;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    .note {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .bottom {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    .bottom .pane {
+      min-height: 160px;
+    }
+
+    .bottom pre {
+      min-height: 118px;
+    }
+
+    .footnote {
+      margin: 14px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    code {
+      font-family: "Cascadia Code", Consolas, monospace;
+    }
+
+    @media (max-width: 700px) {
+      body {
+        padding: 9px;
+      }
+
+      .lab {
+        padding: 16px;
+        border-radius: 15px;
+      }
+
+      .recipes {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .inspector,
+      .bottom {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 460px) {
+      .recipes {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <section class="lab" id="attribute-lab" aria-labelledby="attribute-title">
+    <p class="eyebrow">INTERACTIVE CHEATSHEET</p>
+    <h1 id="attribute-title">点一点，看清属性背后的规则</h1>
+    <p class="intro">以任务为导向选择配方：左侧是 Rust 写法，右侧是 clap 推断出的行为。属性不是魔法，它们只是把 Builder 元数据写得更紧凑。</p>
+
+    <div class="recipes" id="recipes" aria-label="属性配方"></div>
+
+    <div class="inspector">
+      <div class="pane">
+        <div class="pane-head">
+          <h2>Derive 写法</h2>
+          <span class="badge" id="recipe-name">必填参数</span>
+        </div>
+        <pre id="rust-code"></pre>
+      </div>
+
+      <div class="pane">
+        <div class="pane-head">
+          <h2>Clap 眼中的规则</h2>
+          <span class="badge">推断结果</span>
+        </div>
+        <div class="details">
+          <p class="detail-title">行为标签</p>
+          <div class="chips" id="behavior-chips"></div>
+          <p class="detail-title">命令行示例</p>
+          <code class="example" id="cli-example"></code>
+          <p class="note" id="recipe-note"></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom">
+      <div class="pane">
+        <div class="pane-head">
+          <h2>等价的 Builder 思路</h2>
+          <span class="badge">运行时元数据</span>
+        </div>
+        <pre id="builder-code"></pre>
+      </div>
+      <div class="pane">
+        <div class="pane-head">
+          <h2>更完整的使用示例</h2>
+          <span class="badge">对比着看</span>
+        </div>
+        <pre id="full-code"></pre>
+      </div>
+    </div>
+
+    <p class="footnote">提示：<code>short</code>、<code>long</code> 只改变参数的名字与形式；是否必填、消费几个值，主要由字段类型和 <code>action</code>、<code>num_args</code> 等属性共同决定。</p>
+  </section>
+
+  <script>
+    (() => {
+      const recipes = [
+        {
+          id: "required",
+          label: "必填参数",
+          hint: "String",
+          name: "required",
+          rust: `#[arg(short, long)]\nname: String,`,
+          behaviors: ["required = true", "ArgAction::Set", "value_parser!(String)"],
+          cli: "demo --name Alice",
+          note: "String 不是 Option，也没有默认值，所以 clap 会把它视为必填；参数缺失时不会进入业务逻辑。",
+          builder: `Arg::new("name")\n    .short('n')\n    .long("name")\n    .required(true)\n    .value_parser(value_parser!(String))`,
+          full: `#[derive(Debug, Parser)]\nstruct Cli {\n    #[arg(short, long)]\n    name: String,\n}\n\n// demo --name Alice\n// Cli { name: \"Alice\" }`
+        },
+        {
+          id: "optional",
+          label: "可选参数",
+          hint: "Option<T>",
+          name: "optional",
+          rust: `#[arg(short, long)]\noutput: Option<PathBuf>,`,
+          behaviors: ["required = false", "缺失时为 None", "value_parser!(PathBuf)"],
+          cli: "demo\n# 或\ndemo --output report.csv",
+          note: "Option 表达“允许没有”。如果希望未传入时得到一个具体值，应使用 default_value 或 default_value_t。",
+          builder: `Arg::new("output")\n    .short('o')\n    .long("output")\n    .required(false)\n    .value_parser(value_parser!(PathBuf))`,
+          full: `#[derive(Debug, Parser)]\nstruct Cli {\n    #[arg(short, long)]\n    output: Option<PathBuf>,\n}\n\n// 省略参数时得到 None`
+        },
+        {
+          id: "switch",
+          label: "布尔开关",
+          hint: "bool",
+          name: "switch",
+          rust: `#[arg(short, long)]\nverbose: bool,`,
+          behaviors: ["ArgAction::SetTrue", "不消费后续值", "默认 false"],
+          cli: "demo --verbose\n# 错误：demo --verbose true",
+          note: "bool 字段默认就是开关。命令行里写了参数即 true；不需要也不应再提供 true/false 字符串。",
+          builder: `Arg::new("verbose")\n    .short('v')\n    .long("verbose")\n    .action(ArgAction::SetTrue)`,
+          full: `#[derive(Debug, Parser)]\nstruct Cli {\n    #[arg(short, long)]\n    verbose: bool,\n}\n\n// demo --verbose\n// Cli { verbose: true }`
+        },
+        {
+          id: "count",
+          label: "重复计数",
+          hint: "u8 + Count",
+          name: "count",
+          rust: `#[arg(\n    short = 'v',\n    long = "verbose",\n    action = ArgAction::Count\n)]\nverbose: u8,`,
+          behaviors: ["ArgAction::Count", "-v / -vv / -vvv", "缺失时为 0"],
+          cli: "demo -vv\n# verbose = 2",
+          note: "短选项簇会被逐个扫描。Count 记录出现次数，因此 u8 通常足够；也不必写 default_value_t = 0。",
+          builder: `Arg::new("verbose")\n    .short('v')\n    .long("verbose")\n    .action(ArgAction::Count)`,
+          full: `#[derive(Debug, Parser)]\nstruct Cli {\n    #[arg(short, long, action = ArgAction::Count)]\n    verbose: u8,\n}\n\n// demo -vvvv\n// Cli { verbose: 4 }`
+        },
+        {
+          id: "multiple",
+          label: "可重复取值",
+          hint: "Vec<T>",
+          name: "multiple",
+          rust: `#[arg(short, long, value_delimiter = ',')]\ntags: Vec<String>,`,
+          behaviors: ["ArgAction::Append", "可多次出现", "输出 Vec<String>"],
+          cli: "demo -t rust,cli -t parser\n# vec![\"rust\", \"cli\", \"parser\"]",
+          note: "Vec<T> 让同一个参数可以累积多个值。value_delimiter 还可以把一次输入按逗号拆开。",
+          builder: `Arg::new("tags")\n    .short('t')\n    .long("tags")\n    .action(ArgAction::Append)\n    .value_delimiter(',')`,
+          full: `#[derive(Debug, Parser)]\nstruct Cli {\n    #[arg(short, long, value_delimiter = ',')]\n    tags: Vec<String>,\n}\n\n// 未传参数时是空 Vec，不是 None`
+        },
+        {
+          id: "env",
+          label: "环境变量回退",
+          hint: "#[arg(env)]",
+          name: "env",
+          rust: `#[arg(\n    long,\n    env = "APP_PORT",\n    default_value_t = 8080\n)]\nport: u16,`,
+          behaviors: ["CLI 优先", "否则读取 APP_PORT", "最后使用 8080"],
+          cli: "APP_PORT=7000 demo\n# port = 7000\n\ndemo --port 9000\n# port = 9000",
+          note: "env 属性需要 clap 的 env feature。它只提供值，不会改变字段的 Rust 类型。",
+          builder: `Arg::new("port")\n    .long("port")\n    .env("APP_PORT")\n    .default_value("8080")\n    .value_parser(value_parser!(u16))`,
+          full: `// Cargo.toml:\n// clap = { version = "4", features = [\"derive\", \"env\"] }\n\n#[arg(long, env = "APP_PORT", default_value_t = 8080)]\nport: u16,`
+        },
+        {
+          id: "range",
+          label: "范围校验",
+          hint: "value_parser",
+          name: "range",
+          rust: `#[arg(\n    long,\n    value_parser =\n        value_parser!(u16).range(1..=65535)\n)]\nport: u16,`,
+          behaviors: ["先解析为 u16", "再检查 1..=65535", "失败时输出 clap 错误"],
+          cli: "demo --port 443\n# port = 443\n\ndemo --port 0\n# error: 0 is not in 1..=65535",
+          note: "value_parser 是“字符串 → 强类型”的边界。类型转换和业务校验尽量放在这里，main 中就能拿到可信值。",
+          builder: `Arg::new("port")\n    .long("port")\n    .value_parser(\n        value_parser!(u16).range(1..=65535)\n    )`,
+          full: `#[derive(Debug, Parser)]\nstruct Cli {\n    #[arg(long, value_parser = value_parser!(u16).range(1..=65535))]\n    port: u16,\n}\n\n// 0 会在解析阶段被拒绝`
+        },
+        {
+          id: "enum",
+          label: "限定候选值",
+          hint: "ValueEnum",
+          name: "enum",
+          rust: `#[derive(Clone, ValueEnum)]\nenum Format { Text, Json, Csv }\n\n#[arg(short, long, value_enum)]\nformat: Format,`,
+          behaviors: ["possible values", "value_parser!(Format)", "参数值转为枚举变体"],
+          cli: "demo --format json\n# Format::Json\n\ndemo --format xml\n# clap 自动列出候选值",
+          note: "ValueEnum 把“允许哪些值”写入元数据。用户输入错误时，clap 能在进入业务代码前给出清晰提示。",
+          builder: `Arg::new("format")\n    .short('f')\n    .long("format")\n    .value_parser(value_parser!(Format))`,
+          full: `#[derive(Debug, Clone, Copy, ValueEnum)]\nenum Format {\n    Text,\n    Json,\n    Csv,\n}\n\n#[arg(short, long, value_enum)]\nformat: Format,`
+        }
+      ];
+
+      const recipeRoot = document.getElementById("recipes");
+      const recipeName = document.getElementById("recipe-name");
+      const rustCode = document.getElementById("rust-code");
+      const behaviorChips = document.getElementById("behavior-chips");
+      const cliExample = document.getElementById("cli-example");
+      const recipeNote = document.getElementById("recipe-note");
+      const builderCode = document.getElementById("builder-code");
+      const fullCode = document.getElementById("full-code");
+
+      const render = (recipe) => {
+        recipeName.textContent = recipe.label;
+        rustCode.textContent = recipe.rust;
+        cliExample.textContent = recipe.cli;
+        recipeNote.textContent = recipe.note;
+        builderCode.textContent = recipe.builder;
+        fullCode.textContent = recipe.full;
+        behaviorChips.replaceChildren();
+        recipe.behaviors.forEach((behavior) => {
+          const chip = document.createElement("span");
+          chip.className = "chip";
+          chip.textContent = behavior;
+          behaviorChips.append(chip);
+        });
+      };
+
+      recipes.forEach((recipe, index) => {
+        const button = document.createElement("button");
+        const title = document.createElement("strong");
+        const hint = document.createElement("span");
+        button.type = "button";
+        button.className = "recipe";
+        button.dataset.recipe = recipe.id;
+        button.setAttribute("aria-pressed", index === 0 ? "true" : "false");
+        title.textContent = recipe.label;
+        hint.textContent = recipe.hint;
+        button.append(title, hint);
+        recipeRoot.append(button);
+        button.addEventListener("click", () => {
+          recipeRoot.querySelectorAll(".recipe").forEach((item) => {
+            item.setAttribute("aria-pressed", String(item === button));
+          });
+          render(recipe);
+        });
+      });
+
+      render(recipes[0]);
+    })();
+  </script>
+</body>
+</html>
