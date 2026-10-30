@@ -975,6 +975,29 @@ const isCommandK =
 
 ## 8. 内容与 front-matter
 
+### 创建文章：
+
+仅创建草稿：
+```powershell
+hexo new draft "Rust Clap学习"
+```
+
+默认情况下，草稿不会像正式文章一样直接进入网站。
+
+你可以运行：
+
+```powershell
+hexo --draft server
+```
+
+如果想将草稿转为正式文章，可以执行：
+
+```powershell
+hexo publish "Rust Clap学习"
+```
+
+
+
 文章示例：
 
 ```yaml
